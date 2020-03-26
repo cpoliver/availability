@@ -1,7 +1,7 @@
 import React from "react";
 import { isToday } from "date-fns";
 import { addDays, format, startOfWeek } from "date-fns/fp";
-import { flip, range, pipe } from "ramda";
+import { flip, range, pipe, splitAt } from "ramda";
 /** @jsx jsx */
 import { css, jsx } from "@emotion/core";
 
@@ -66,37 +66,43 @@ export const Schedule = ({
   );
 };
 
-const Day = ({ date }) => (
-  <div
-    css={css`
-      align-items: center;
-      background: #f8f9fa;
-      border-radius: 8px;
-      border: 3px solid ${isToday(date) ? "#5b58f3" : "transparent"};
-      color: ${isToday(date) ? "#5b58f3" : ""};
-      display: flex;
-      flex-direction: column;
-      margin: 8px;
-      padding: 12px;
-      width: 120px;
-    `}
-  >
+const Day = ({ date }) => {
+  const [day, ordinal] = splitAt(-2, format("do", date));
+
+  return (
     <div
       css={css`
-        padding: 4px;
+        align-items: center;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 3px solid ${isToday(date) ? "#5b58f3" : "transparent"};
+        color: ${isToday(date) ? "#5b58f3" : ""};
+        display: flex;
+        flex-direction: column;
+        margin: 8px;
+        padding: 12px;
+        cursor: pointer;
+        width: 120px;
       `}
     >
-      {format("do", date)}
+      <div
+        css={css`
+          padding: 4px;
+        `}
+      >
+        <strong>{day}</strong>
+        <small>{ordinal}</small>
+      </div>
+      <div
+        css={css`
+          padding: 4px;
+        `}
+      >
+        {format("E", date)}
+      </div>
     </div>
-    <div
-      css={css`
-        padding: 4px;
-      `}
-    >
-      {format("E", date)}
-    </div>
-  </div>
-);
+  );
+};
 
 const Time = ({ hour }) => (
   <div
@@ -105,6 +111,7 @@ const Time = ({ hour }) => (
       border: 2px solid black;
       border-radius: 8px;
       margin: 8px;
+      cursor: pointer;
       font-size: 1.5rem;
     `}
   >
