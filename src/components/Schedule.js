@@ -1,5 +1,6 @@
 import React from "react";
-import { addDays, format } from "date-fns/fp";
+import { isToday } from "date-fns";
+import { addDays, format, startOfWeek } from "date-fns/fp";
 import { flip, range, pipe } from "ramda";
 /** @jsx jsx */
 import { css, jsx } from "@emotion/core";
@@ -16,11 +17,12 @@ const padTime = str => str.toString().padStart(2, "0");
 const getTimezone = () => format("xxxxx", new Date());
 
 export const Schedule = ({
-  currentDate,
+  currentDate = new Date(),
   startHour = 8,
   endHour = 20 + 1, // range is up to, but not including
 }) => {
-  const days = range(0, DAYS_IN_WEEK).map(flip(addDays));
+  const weekStart = startOfWeek(currentDate);
+  const days = range(0, DAYS_IN_WEEK).map(offset => addDays(offset, weekStart));
   const hours = range(START_OF_SCHEDULE, END_OF_SCHEDULE).map(padTime);
 
   return (
@@ -70,7 +72,8 @@ const Day = ({ date }) => (
       align-items: center;
       background: #f8f9fa;
       border-radius: 8px;
-      /* border: 3px solid #5b58f3; */
+      border: 3px solid ${isToday(date) ? "#5b58f3" : "transparent"};
+      color: ${isToday(date) ? "#5b58f3" : ""};
       display: flex;
       flex-direction: column;
       margin: 8px;
