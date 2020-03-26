@@ -29,11 +29,11 @@ export const Schedule = ({
     <div
       css={css`
         align-items: center;
-        color: #374149;
+        color: #41484f;
         display: flex;
         flex-direction: column;
-        font-size: 1.4rem;
-        font-weight: 700;
+        font-size: 1.6rem;
+        font-weight: 500;
       `}
     >
       <div
@@ -79,6 +79,7 @@ const Day = ({ date }) => {
         color: ${isToday(date) ? "#5b58f3" : ""};
         display: flex;
         flex-direction: column;
+        font-weight: 700;
         margin: 8px;
         padding: 12px;
         cursor: pointer;
@@ -90,8 +91,15 @@ const Day = ({ date }) => {
           padding: 4px;
         `}
       >
-        <strong>{day}</strong>
-        <small>{ordinal}</small>
+        {day}
+        <small
+          css={css`
+            font-size: 1rem;
+            font-weight: 600;
+          `}
+        >
+          {ordinal}
+        </small>
       </div>
       <div
         css={css`
