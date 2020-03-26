@@ -1,12 +1,10 @@
-import React from "react";
 import { isToday } from "date-fns";
 import { addDays, format, startOfWeek } from "date-fns/fp";
-import { flip, range, pipe, splitAt } from "ramda";
+import { range, splitAt } from "ramda";
 /** @jsx jsx */
 import { css, jsx } from "@emotion/core";
 
 const DAYS_IN_WEEK = 7;
-const MINUTES_IN_HOUR = 60;
 
 // TODO: move to and pass props from App
 const START_OF_SCHEDULE = 8;
@@ -39,6 +37,7 @@ export const Schedule = ({
       <div
         css={css`
           margin: 24px;
+          font-weight: 600;
         `}
       >
         Your timezone: GMT {getTimezone()}
@@ -75,14 +74,14 @@ const Day = ({ date }) => {
         align-items: center;
         background: #f8f9fa;
         border-radius: 8px;
-        border: 3px solid ${isToday(date) ? "#5b58f3" : "transparent"};
-        color: ${isToday(date) ? "#5b58f3" : ""};
+        border: 3px solid ${isToday(date) ? "#5a5dea" : "transparent"};
+        color: ${isToday(date) ? "#5a5dea" : ""};
+        cursor: pointer;
         display: flex;
         flex-direction: column;
         font-weight: 700;
-        margin: 8px;
+        margin: 4px;
         padding: 12px;
-        cursor: pointer;
         width: 120px;
       `}
     >
@@ -115,12 +114,13 @@ const Day = ({ date }) => {
 const Time = ({ hour }) => (
   <div
     css={css`
-      padding: 8px 16px;
-      border: 2px solid black;
       border-radius: 8px;
-      margin: 8px;
+      border: 2px solid black;
       cursor: pointer;
       font-size: 1.5rem;
+      font-weight: 600;
+      margin: 8px;
+      padding: 8px 16px;
     `}
   >
     {hour}:00
