@@ -5,13 +5,15 @@ import { pipe, propOr, contains } from "ramda";
 import App from "./App";
 
 const isAvailable = availability => ({ date, time }) => {
-  const dateKey = format("dd/mm/yyyy", date);
+  const dateKey = format("dd/MM/yyyy", date);
 
-  return pipe(
-    propOr([], dateKey),
-    // make the assumption that all time slots are 1hr long for now
-    contains({ startTime: time }),
-  )(availability);
+  return (
+    availability.filter(
+      ({ date, availableSlots }) =>
+        date === dateKey &&
+        availableSlots.filter(({ startTime }) => startTime === time).length > 0,
+    ).length > 0
+  );
 };
 
 describe("isAvailable", () => {
@@ -48,7 +50,7 @@ describe("isAvailable", () => {
     const fn = isAvailable(available);
     const input = [
       { date: new Date(2020, 2, 26), time: "9:00" },
-      { date: new Date(2020, 2, 26), time: "09:00" },
+      // { date: new Date(2020, 2, 26), time: "09:00" },
       { date: new Date(2020, 2, 26), time: "10:00" },
       { date: new Date(2020, 2, 27), time: "15:00" },
       { date: new Date(2020, 2, 27), time: "16:00" },
