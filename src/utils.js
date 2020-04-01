@@ -1,6 +1,12 @@
 import * as R from "ramda";
 import { format } from "date-fns/fp";
 
+import { HOURS_IN_DAY, STATUS } from "./constants";
+
+const HOUR_SLOTS = R.range(0, HOURS_IN_DAY);
+
+// client-side
+
 export const isAvailable = availability => ({ date, time }) => {
   const dateKey = format("dd/MM/yyyy", date);
 
@@ -17,6 +23,8 @@ export const isAvailable = availability => ({ date, time }) => {
 
 const toHours = isoDateStr => new Date(isoDateStr).getHours();
 const toTimeString = hour => `${hour}:00`;
+const isBusy = R.propEq("status", STATUS.BUSY);
+const invertHours = R.flip(R.without)(HOUR_SLOTS);
 
 export const dayFromScheduleItem = ({ start }) =>
   format("dd/MM/yyyy", new Date(start.dateTime));
@@ -29,7 +37,13 @@ export const rangeToStartEnd = R.map(hour => ({
   endTime: toTimeString(hour === 23 ? 0 : hour + 1),
 }));
 
-export const getAvailableHours = scheduleItems => scheduleItems;
+export const getAvailableHours = R.pipe(
+  R.filter(isBusy),
+  R.chain(transformRange),
+  R.uniq,
+  invertHours,
+  rangeToStartEnd,
+);
 
 export const getDays = scheduleItems => ({});
 
