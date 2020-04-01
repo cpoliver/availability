@@ -5,10 +5,11 @@ import { transformedSchedule } from "./data/transformedData";
 import {
   isAvailable,
   getDays,
-  getBusyHours,
   dayFromScheduleItem,
+  rangeToStartEnd,
   transformDay,
   transformRange,
+  getAvailableHours,
 } from "./utils";
 
 describe("isAvailable", () => {
@@ -74,6 +75,21 @@ describe("officeObject to schedule", () => {
 
   const days = R.groupBy(dayFromScheduleItem, scheduleItems);
 
+  const ranges = [
+    {
+      start: { dateTime: "2020-04-02T00:00:00.0000000" },
+      end: { dateTime: "2020-04-02T13:00:00.0000000" },
+    },
+    {
+      start: { dateTime: "2020-04-12T01:00:00.0000000" },
+      end: { dateTime: "2020-04-12T04:00:00.0000000" },
+    },
+    {
+      start: { dateTime: "2020-04-02T09:00:00.0000000" },
+      end: { dateTime: "2020-04-02T10:00:00.0000000" },
+    },
+  ];
+
   describe("dayFromScheduleItem", () => {
     it("should return the dd/MM/yyy date for a given schedule item", () => {
       const first = dayFromScheduleItem(R.head(scheduleItems));
@@ -86,40 +102,26 @@ describe("officeObject to schedule", () => {
 
   describe("transformRange", () => {
     it("should take a start and end time and return an array of hourly slots", () => {
-      const actual1 = transformRange({
-        start: { dateTime: "2020-04-02T09:00:00.0000000" },
-        end: { dateTime: "2020-04-02T10:00:00.0000000" },
-      });
+      const actual = ranges.map(transformRange);
 
-      const actual2 = transformRange({
-        start: { dateTime: "2020-04-02T00:00:00.0000000" },
-        end: { dateTime: "2020-04-02T13:00:00.0000000" },
-      });
-
-      const actual3 = transformRange({
-        start: { dateTime: "2020-04-12T01:00:00.0000000" },
-        end: { dateTime: "2020-04-12T04:00:00.0000000" },
-      });
-
-      expect(actual1).toEqual([9]);
-      expect(actual2).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
-      expect(actual3).toEqual([1, 2, 3]);
+      expect(actual[0]).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+      expect(actual[1]).toEqual([1, 2, 3]);
+      expect(actual[2]).toEqual([9]);
     });
   });
 
-  describe.skip("getBusyHours", () => {
-    it("should return an array of hourly slots that are busy", () => {
-      const actual1 = getBusyHours(days[0]);
-      const expected1 = [11, 12];
-      // filter only busy
-      // convert ranges to hour arrays
-    });
-  });
+  describe("rangeToStartEnd", () => {
+    it("should return an array of start/end times an array of slots", () => {
+      const actual = rangeToStartEnd([1, 2, 3, 9, 13, 23]);
 
-  describe.skip("getAvailableHours", () => {
-    it("should return an array of start/end times for available slots", () => {
-      // invert busy to available
-      // convert hours to start/end object
+      expect(actual).toEqual([
+        { startTime: "1:00", endTime: "2:00" },
+        { startTime: "2:00", endTime: "3:00" },
+        { startTime: "3:00", endTime: "4:00" },
+        { startTime: "9:00", endTime: "10:00" },
+        { startTime: "13:00", endTime: "14:00" },
+        { startTime: "23:00", endTime: "0:00" },
+      ]);
     });
   });
 

@@ -13,22 +13,26 @@ export const isAvailable = availability => ({ date, time }) => {
   );
 };
 
-export const getDays = scheduleItems => ({});
+// server-side
+
+const toHours = isoDateStr => new Date(isoDateStr).getHours();
+const toTimeString = hour => `${hour}:00`;
 
 export const dayFromScheduleItem = ({ start }) =>
   format("dd/MM/yyyy", new Date(start.dateTime));
 
+export const transformRange = ({ start, end }) =>
+  R.range(toHours(start.dateTime), toHours(end.dateTime));
+
+export const rangeToStartEnd = R.map(hour => ({
+  startTime: toTimeString(hour),
+  endTime: toTimeString(hour === 23 ? 0 : hour + 1),
+}));
+
+export const getAvailableHours = scheduleItems => scheduleItems;
+
+export const getDays = scheduleItems => ({});
+
 export const transformDay = scheduleItems => ({});
 
-const toHours = isoDateStr => new Date(isoDateStr).getHours();
-
-export const transformRange = ({ start, end }) => {
-  const from = toHours(start.dateTime);
-  const to = toHours(end.dateTime);
-
-  return R.range(from, to);
-};
-
 export const transformSchedule = schedule => schedule;
-
-export const getBusyHours = scheduleItems => scheduleItems;
