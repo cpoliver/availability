@@ -1,41 +1,31 @@
-import React, { useState } from "react";
-import { isToday } from "date-fns";
-import { addDays, format, startOfWeek, isSameDay } from "date-fns/fp";
-import { range, splitAt } from "ramda";
 /** @jsx jsx */
 import { css, jsx } from "@emotion/core";
+import { useState } from "react";
+import { addDays, format, startOfWeek, isSameDay } from "date-fns/fp";
+import { range, toString } from "ramda";
 
+import { Day } from "./Day";
+import { Time } from "./Time";
 import { isAvailable } from "../utils";
-
-const DAYS_IN_WEEK = 7;
-
-// TODO: move to and pass props from App
-const START_OF_SCHEDULE = 8;
-const END_OF_SCHEDULE = 20 + 1;
-
-const padTime = str => str.toString(); //.padStart(2, "0");
+import { DAYS_IN_WEEK } from "../constants";
 
 const getTimezone = () => format("xxxxx", new Date());
 
 export const Schedule = ({
   availability,
+  startHour,
+  endHour,
   currentDate = new Date(),
-  startHour = 8,
-  endHour = 20 + 1, // range is up to, but not including
 }) => {
   const weekStart = startOfWeek(currentDate);
   const days = range(0, DAYS_IN_WEEK).map(offset => addDays(offset, weekStart));
-  const hours = range(START_OF_SCHEDULE, END_OF_SCHEDULE).map(padTime);
-
-  console.log({ hours });
+  const hours = range(startHour, endHour + 1).map(toString);
 
   const [selectedDate, setSelectedDate] = useState(currentDate);
 
   const isDayAvailable = dateToCheck =>
-    availability.filter(({ date }) => {
-      const formattedDate = format("dd/MM/yyy", dateToCheck);
-      return date === formattedDate;
-    }).length > 0;
+    availability.filter(({ date }) => date === format("dd/MM/yyy", dateToCheck))
+      .length > 0;
 
   return (
     <div
@@ -62,7 +52,7 @@ export const Schedule = ({
         `}
       >
         {days.map((d, i) => (
-          <div key={i} onClick={() => setSelectedDate(d)}>
+          <div key={i} onClick={() => isDayAvailable(d) && setSelectedDate(d)}>
             <Day
               date={d}
               hasAvailability={isDayAvailable(d)}
@@ -88,65 +78,3 @@ export const Schedule = ({
     </div>
   );
 };
-
-const Day = ({ date, isSelected = false, hasAvailability = false }) => {
-  const [day, ordinal] = splitAt(-2, format("do", date));
-
-  return (
-    <div
-      css={css`
-        align-items: center;
-        background: ${hasAvailability ? "#e5e5e5" : "#f8f9fa"};
-        border-radius: 8px;
-        border: 3px solid ${isSelected ? "#5a5dea" : "transparent"};
-        color: ${isToday(date) ? "#5a5dea" : ""};
-        cursor: ${hasAvailability ? "pointer" : "initial"};
-        display: flex;
-        flex-direction: column;
-        font-weight: 700;
-        margin: 4px;
-        padding: 12px;
-        width: 120px;
-      `}
-    >
-      <div
-        css={css`
-          padding: 4px;
-        `}
-      >
-        {day}
-        <small
-          css={css`
-            font-size: 1rem;
-            font-weight: 600;
-          `}
-        >
-          {ordinal}
-        </small>
-      </div>
-      <div
-        css={css`
-          padding: 4px;
-        `}
-      >
-        {format("E", date)}
-      </div>
-    </div>
-  );
-};
-
-const Time = ({ hour }) => (
-  <div
-    css={css`
-      border-radius: 8px;
-      border: 2px solid black;
-      cursor: pointer;
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin: 8px;
-      padding: 8px 16px;
-    `}
-  >
-    {hour}:00
-  </div>
-);

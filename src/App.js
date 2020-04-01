@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 
 import "./App.css";
+import { SERVER_URL, START_OF_SCHEDULE, END_OF_SCHEDULE } from "./constants";
 import { Schedule } from "./components/Schedule";
-
-const SERVER_URL = "http://localhost:8080";
 
 function App() {
   const [availability, setAvailability] = useState([]);
@@ -24,7 +23,11 @@ function App() {
 
   return (
     <>
-      <Schedule availability={availability} />
+      <Schedule
+        availability={availability}
+        startHour={START_OF_SCHEDULE}
+        endHour={END_OF_SCHEDULE}
+      />
       <hr />
       <pre>{JSON.stringify(availability, null, 2)}</pre>
     </>
