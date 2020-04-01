@@ -45,7 +45,7 @@ export const getAvailableHours = R.pipe(
   rangeToStartEnd,
 );
 
-export const getDays = scheduleItems => ({});
+export const getDays = R.groupBy(dayFromScheduleItem);
 
 export const transformDay = scheduleItems => ({});
 

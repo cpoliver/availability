@@ -160,6 +160,19 @@ describe("officeObject to schedule", () => {
     });
   });
 
+  describe("getDays", () => {
+    it("should group scheduleItems under a dd/MM/yyyy key", () => {
+      const first3days = R.take(5, scheduleItems);
+      const actual = getDays(first3days);
+
+      expect(actual).toEqual({
+        "30/03/2020": [scheduleItems[0]],
+        "31/03/2020": [scheduleItems[1], scheduleItems[2]],
+        "01/04/2020": [scheduleItems[3], scheduleItems[4]],
+      });
+    });
+  });
+
   describe.skip("transformDay", () => {
     it("should return a list of partially transformed availability objects", () => {
       const expected = [
