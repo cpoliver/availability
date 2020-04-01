@@ -1,4 +1,8 @@
-import { isAvailable } from "./utils";
+import * as R from "ramda";
+
+import { schedule } from "./data/inputData";
+import { transformedSchedule } from "./data/transformedData";
+import { isAvailable, getDays, dayFromStartTime, transformDay } from "./utils";
 
 describe("isAvailable", () => {
   const available = [
@@ -52,5 +56,57 @@ describe("isAvailable", () => {
     ];
 
     input.forEach(i => expect(fn(i)).toBe(false));
+  });
+});
+
+describe("officeObject to schedule", () => {
+  const { scheduleItems } = schedule.value[0];
+  const scheduleItemBusy = scheduleItems[0];
+  const scheduleItemTentative = scheduleItems[1];
+
+  describe("dayFromStartTime", () => {
+    it("should return the dd/MM/yyy date for a given schedule item", () => {
+      const firstDay = dayFromStartTime(R.head(scheduleItems));
+      const lastDay = dayFromStartTime(R.last(scheduleItems));
+
+      expect(firstDay).toEqual("30/03/2020");
+      expect(lastDay).toEqual("01/05/2020");
+    });
+  });
+
+  describe.skip("getBusyHours", () => {
+    it("should return an array of hourly slots that are busy", () => {
+      // filter only busy
+      // convert ranges to hour arrays
+    });
+  });
+
+  describe.skip("getAvailableHours", () => {
+    it("should return an array of start/end times for available slots", () => {
+      // invert busy to available
+      // convert hours to start/end object
+    });
+  });
+
+  describe.skip("transformSchedule", () => {
+    it("should return a list of partially transformed availibility objects", () => {
+      const expected = [
+        {
+          date: "30/03/2020",
+          availableSlots: [
+            // TBC
+          ],
+        },
+        {
+          date: "30/03/2020",
+          availableSlots: [
+            // TBC
+          ],
+        },
+      ];
+
+      const actual = transformSchedule(schedule);
+      expect(actual).toEqual(transformedSchedule);
+    });
   });
 });

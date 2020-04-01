@@ -1,4 +1,4 @@
-export const officeData = {
+export const schedule = {
   "@odata.context":
     "https://graph.microsoft.com/v1.0/$metadata#Collection(microsoft.graph.scheduleInformation)",
   value: [

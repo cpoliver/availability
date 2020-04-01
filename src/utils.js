@@ -11,3 +11,12 @@ export const isAvailable = availability => ({ date, time }) => {
     ).length > 0
   );
 };
+
+export const getDays = scheduleItems => ({});
+
+export const dayFromStartTime = ({ start }) =>
+  format("dd/MM/yyyy", new Date(start.dateTime));
+
+export const transformDay = scheduleItems => ({});
+
+export const transformSchedule = schedule => schedule;
