@@ -2,7 +2,14 @@ import * as R from "ramda";
 
 import { schedule } from "./data/inputData";
 import { transformedSchedule } from "./data/transformedData";
-import { isAvailable, getDays, dayFromStartTime, transformDay } from "./utils";
+import {
+  isAvailable,
+  getDays,
+  getBusyHours,
+  dayFromScheduleItem,
+  transformDay,
+  transformRange,
+} from "./utils";
 
 describe("isAvailable", () => {
   const available = [
@@ -61,21 +68,49 @@ describe("isAvailable", () => {
 
 describe("officeObject to schedule", () => {
   const { scheduleItems } = schedule.value[0];
+
   const scheduleItemBusy = scheduleItems[0];
   const scheduleItemTentative = scheduleItems[1];
 
-  describe("dayFromStartTime", () => {
-    it("should return the dd/MM/yyy date for a given schedule item", () => {
-      const firstDay = dayFromStartTime(R.head(scheduleItems));
-      const lastDay = dayFromStartTime(R.last(scheduleItems));
+  const days = R.groupBy(dayFromScheduleItem, scheduleItems);
 
-      expect(firstDay).toEqual("30/03/2020");
-      expect(lastDay).toEqual("01/05/2020");
+  describe("dayFromScheduleItem", () => {
+    it("should return the dd/MM/yyy date for a given schedule item", () => {
+      const first = dayFromScheduleItem(R.head(scheduleItems));
+      const last = dayFromScheduleItem(R.last(scheduleItems));
+
+      expect(first).toEqual("30/03/2020");
+      expect(last).toEqual("01/05/2020");
+    });
+  });
+
+  describe("transformRange", () => {
+    it("should take a start and end time and return an array of hourly slots", () => {
+      const actual1 = transformRange({
+        start: { dateTime: "2020-04-02T09:00:00.0000000" },
+        end: { dateTime: "2020-04-02T10:00:00.0000000" },
+      });
+
+      const actual2 = transformRange({
+        start: { dateTime: "2020-04-02T00:00:00.0000000" },
+        end: { dateTime: "2020-04-02T13:00:00.0000000" },
+      });
+
+      const actual3 = transformRange({
+        start: { dateTime: "2020-04-12T01:00:00.0000000" },
+        end: { dateTime: "2020-04-12T04:00:00.0000000" },
+      });
+
+      expect(actual1).toEqual([9]);
+      expect(actual2).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+      expect(actual3).toEqual([1, 2, 3]);
     });
   });
 
   describe.skip("getBusyHours", () => {
     it("should return an array of hourly slots that are busy", () => {
+      const actual1 = getBusyHours(days[0]);
+      const expected1 = [11, 12];
       // filter only busy
       // convert ranges to hour arrays
     });
