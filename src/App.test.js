@@ -1,16 +1,15 @@
 import * as R from "ramda";
 
 import { schedule } from "./data/inputData";
-import { transformedSchedule } from "./data/transformedData";
 import { STATUS } from "./constants";
 import {
+  allHours,
   isAvailable,
   getDays,
   dayFromScheduleItem,
   rangeToStartEnd,
   transformRange,
   getAvailableHours,
-  transformDay,
   transformSchedule,
 } from "./utils";
 
@@ -75,8 +74,6 @@ describe("officeObject to schedule", () => {
   const scheduleItemBusy = scheduleItems[0];
   const scheduleItemTentative = scheduleItems[1];
 
-  const days = R.groupBy(dayFromScheduleItem, scheduleItems);
-
   const ranges = [
     {
       start: { dateTime: "2020-04-02T00:00:00.0000000" },
@@ -98,7 +95,7 @@ describe("officeObject to schedule", () => {
       const last = dayFromScheduleItem(R.last(scheduleItems));
 
       expect(first).toEqual("30/03/2020");
-      expect(last).toEqual("01/05/2020");
+      expect(last).toEqual("01/04/2020");
     });
   });
 
@@ -162,10 +159,7 @@ describe("officeObject to schedule", () => {
 
   describe("getDays", () => {
     it("should group scheduleItems under a dd/MM/yyyy key", () => {
-      const first3days = R.take(5, scheduleItems);
-      const actual = getDays(first3days);
-
-      expect(actual).toEqual({
+      expect(getDays(scheduleItems)).toEqual({
         "30/03/2020": [scheduleItems[0]],
         "31/03/2020": [scheduleItems[1], scheduleItems[2]],
         "01/04/2020": [scheduleItems[3], scheduleItems[4]],
@@ -173,47 +167,40 @@ describe("officeObject to schedule", () => {
     });
   });
 
-  describe.skip("transformDay", () => {
+  describe("transformSchedule", () => {
     it("should return a list of partially transformed availability objects", () => {
-      const expected = [
-        {
-          date: "30/03/2020",
-          availableSlots: [
-            // TBC
-          ],
-        },
-        {
-          date: "30/03/2020",
-          availableSlots: [
-            // TBC
-          ],
-        },
-      ];
-
-      const actual = transformDay(schedule);
-      expect(actual).toEqual(transformedDay);
-    });
-  });
-
-  describe.skip("transformSchedule", () => {
-    it("should return a list of partially transformed availability objects", () => {
-      const expected = [
-        {
-          date: "30/03/2020",
-          availableSlots: [
-            // TBC
-          ],
-        },
-        {
-          date: "30/03/2020",
-          availableSlots: [
-            // TBC
-          ],
-        },
-      ];
-
       const actual = transformSchedule(schedule);
-      expect(actual).toEqual(transformedSchedule);
+
+      const availableSlots = [
+        { endTime: "1:00", startTime: "0:00" },
+        { endTime: "2:00", startTime: "1:00" },
+        { endTime: "3:00", startTime: "2:00" },
+        { endTime: "4:00", startTime: "3:00" },
+        { endTime: "5:00", startTime: "4:00" },
+        { endTime: "6:00", startTime: "5:00" },
+        { endTime: "7:00", startTime: "6:00" },
+        { endTime: "8:00", startTime: "7:00" },
+        { endTime: "9:00", startTime: "8:00" },
+        { endTime: "10:00", startTime: "9:00" },
+        { endTime: "11:00", startTime: "10:00" },
+        { endTime: "14:00", startTime: "13:00" },
+        { endTime: "15:00", startTime: "14:00" },
+        { endTime: "16:00", startTime: "15:00" },
+        { endTime: "17:00", startTime: "16:00" },
+        { endTime: "18:00", startTime: "17:00" },
+        { endTime: "19:00", startTime: "18:00" },
+        { endTime: "20:00", startTime: "19:00" },
+        { endTime: "21:00", startTime: "20:00" },
+        { endTime: "22:00", startTime: "21:00" },
+        { endTime: "23:00", startTime: "22:00" },
+        { endTime: "0:00", startTime: "23:00" },
+      ];
+
+      expect(actual).toEqual({
+        "30/03/2020": { availableSlots },
+        "31/03/2020": { availableSlots },
+        "01/04/2020": { availableSlots },
+      });
     });
   });
 });
