@@ -1,20 +1,4 @@
-import React from "react";
-import { format } from "date-fns/fp";
-import { pipe, propOr, contains } from "ramda";
-
-import App from "./App";
-
-const isAvailable = availability => ({ date, time }) => {
-  const dateKey = format("dd/MM/yyyy", date);
-
-  return (
-    availability.filter(
-      ({ date, availableSlots }) =>
-        date === dateKey &&
-        availableSlots.filter(({ startTime }) => startTime === time).length > 0,
-    ).length > 0
-  );
-};
+import { isAvailable } from "./utils";
 
 describe("isAvailable", () => {
   const available = [

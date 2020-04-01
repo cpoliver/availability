@@ -1,8 +1,11 @@
+import React, { useState } from "react";
 import { isToday } from "date-fns";
 import { addDays, format, startOfWeek, isSameDay } from "date-fns/fp";
 import { range, splitAt } from "ramda";
 /** @jsx jsx */
 import { css, jsx } from "@emotion/core";
+
+import { isAvailable } from "../utils";
 
 const DAYS_IN_WEEK = 7;
 
@@ -10,7 +13,7 @@ const DAYS_IN_WEEK = 7;
 const START_OF_SCHEDULE = 8;
 const END_OF_SCHEDULE = 20 + 1;
 
-const padTime = str => str.toString().padStart(2, "0");
+const padTime = str => str.toString(); //.padStart(2, "0");
 
 const getTimezone = () => format("xxxxx", new Date());
 
@@ -23,6 +26,10 @@ export const Schedule = ({
   const weekStart = startOfWeek(currentDate);
   const days = range(0, DAYS_IN_WEEK).map(offset => addDays(offset, weekStart));
   const hours = range(START_OF_SCHEDULE, END_OF_SCHEDULE).map(padTime);
+
+  console.log({ hours });
+
+  const [selectedDate, setSelectedDate] = useState(currentDate);
 
   const isDayAvailable = dateToCheck =>
     availability.filter(({ date }) => {
@@ -55,7 +62,13 @@ export const Schedule = ({
         `}
       >
         {days.map((d, i) => (
-          <Day key={i} date={d} hasAvailability={isDayAvailable(d)} />
+          <div key={i} onClick={() => setSelectedDate(d)}>
+            <Day
+              date={d}
+              hasAvailability={isDayAvailable(d)}
+              isSelected={isSameDay(d, selectedDate)}
+            />
+          </div>
         ))}
       </div>
       <div
@@ -64,15 +77,19 @@ export const Schedule = ({
           margin-top: 16px;
         `}
       >
-        {hours.map(h => (
-          <Time key={h} hour={h} />
-        ))}
+        {hours.map(
+          h =>
+            isAvailable(availability)({
+              date: selectedDate,
+              time: `${h}:00`,
+            }) && <Time key={h} hour={h} />,
+        )}
       </div>
     </div>
   );
 };
 
-const Day = ({ date, hasAvailability = false }) => {
+const Day = ({ date, isSelected = false, hasAvailability = false }) => {
   const [day, ordinal] = splitAt(-2, format("do", date));
 
   return (
@@ -81,7 +98,7 @@ const Day = ({ date, hasAvailability = false }) => {
         align-items: center;
         background: ${hasAvailability ? "#e5e5e5" : "#f8f9fa"};
         border-radius: 8px;
-        border: 3px solid ${isToday(date) ? "#5a5dea" : "transparent"};
+        border: 3px solid ${isSelected ? "#5a5dea" : "transparent"};
         color: ${isToday(date) ? "#5a5dea" : ""};
         cursor: ${hasAvailability ? "pointer" : "initial"};
         display: flex;
