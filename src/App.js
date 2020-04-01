@@ -24,7 +24,7 @@ function App() {
 
   return (
     <>
-      <Schedule />
+      <Schedule availability={availability} />
       <hr />
       <pre>{JSON.stringify(availability, null, 2)}</pre>
     </>
